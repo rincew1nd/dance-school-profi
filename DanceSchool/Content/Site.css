@@ -18,3 +18,20 @@ select,
 textarea {
     max-width: 280px;
 }
+
+body {
+    background-color: #FAE3FB !important;
+}
+
+.card {
+    border-radius: 15px;
+}
+
+.shadow {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.img-fluid {
+    max-width: 100%;
+    height: auto;
+}

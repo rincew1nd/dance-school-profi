@@ -58,7 +58,7 @@ namespace DanceSchool.Models
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<Nullable<int>>("Insert_User", emailParameter, passwordParameter, firstNameParameter, lastNameParameter, roleIdParameter);
         }
     
-        public virtual ObjectResult<Nullable<int>> User_Login(string email, string password)
+        public virtual ObjectResult<User_Login_Result> User_Login(string email, string password)
         {
             var emailParameter = email != null ?
                 new ObjectParameter("Email", email) :
@@ -68,7 +68,7 @@ namespace DanceSchool.Models
                 new ObjectParameter("Password", password) :
                 new ObjectParameter("Password", typeof(string));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<Nullable<int>>("User_Login", emailParameter, passwordParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<User_Login_Result>("User_Login", emailParameter, passwordParameter);
         }
     }
 }

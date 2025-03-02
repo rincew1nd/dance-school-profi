@@ -3,39 +3,55 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - My ASP.NET Application</title>
+    <title>@ViewBag.Title - Rina's Dance School</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
+    <style>
+        .navbar-gradient {
+            background: linear-gradient(90deg, #FAE3FB, #D8C3FF);
+        }
+        .footer {
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+        .brand-logo {
+            width: 60px;
+            margin-right: 10px;
+        }
+    </style>
 
 </head>
-<body>
-    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark">
+<body class="d-flex flex-column min-vh-100">
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-gradient shadow-sm">
         <div class="container">
-            @Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
-            <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" title="Toggle navigation" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
+            <a class="navbar-brand d-flex align-items-center" href="@Url.Action("Index", "Home")">
+                <img src="~/Content/Images/Logo.png" alt="Логотип" class="brand-logo">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between">
-                <ul class="navbar-nav flex-grow-1">
+
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     @if (User.Identity.IsAuthenticated)
                     {
-                        <li>@Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "nav-link" })</li>
-                        <li>@Html.ActionLink("Стили", "Index", "Styles", new { area = "" }, new { @class = "nav-link" })</li>
-                        <li>@Html.ActionLink("Занятия", "Index", "Lessons", new { area = "" }, new { @class = "nav-link" })</li>
+                        <li>@Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "nav-link link-dark" })</li>
+                        <li>@Html.ActionLink("Стили", "Index", "Styles", new { area = "" }, new { @class = "nav-link link-dark" })</li>
+                        <li>@Html.ActionLink("Занятия", "Index", "Lessons", new { area = "" }, new { @class = "nav-link link-dark" })</li>
                     }
                 </ul>
-                 @Html.Partial("_LoginPartial")
+                @Html.Partial("_LoginPartial")
             </div>
         </div>
     </nav>
-    <div class="container body-content">
+
+    <main class="container flex-grow-1 py-4">
         @RenderBody()
-        <hr />
-        <footer>
-            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
-        </footer>
-    </div>
+    </main>
+
+    <footer class="footer mt-auto">
+        <p class="text-center text-muted">&copy; @DateTime.Now.Year - Rina's Dance School. Все права защищены.</p>
+    </footer>
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")

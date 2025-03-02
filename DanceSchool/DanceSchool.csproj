@@ -171,9 +171,7 @@
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\LessonsController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
-    <Compile Include="Controllers\StylesController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -209,6 +207,9 @@
     <Compile Include="Models\Style.cs">
       <DependentUpon>DanceSchoolModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\User_Login_Result.cs">
+      <DependentUpon>DanceSchoolModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
@@ -233,6 +234,7 @@
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\bootstrap.rtl.css" />
     <Content Include="Content\bootstrap.rtl.min.css" />
+    <Content Include="Content\Images\Logo.png" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
@@ -290,18 +292,7 @@
     <Content Include="Views\Manage\ManageLogins.cshtml" />
     <Content Include="Views\Manage\SetPassword.cshtml" />
     <Content Include="Views\Manage\VerifyPhoneNumber.cshtml" />
-    <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
-    <Content Include="Views\Styles\Create.cshtml" />
-    <Content Include="Views\Styles\Delete.cshtml" />
-    <Content Include="Views\Styles\Details.cshtml" />
-    <Content Include="Views\Styles\Edit.cshtml" />
-    <Content Include="Views\Styles\Index.cshtml" />
-    <Content Include="Views\Lessons\Create.cshtml" />
-    <Content Include="Views\Lessons\Delete.cshtml" />
-    <Content Include="Views\Lessons\Details.cshtml" />
-    <Content Include="Views\Lessons\Edit.cshtml" />
-    <Content Include="Views\Lessons\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />

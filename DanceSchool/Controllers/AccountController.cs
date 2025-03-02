@@ -44,10 +44,10 @@ namespace DanceSchool.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var userId = db.User_Login(model.Email, model.Password).First();
-                    if (userId != null)
+                    var userInfo = db.User_Login(model.Email, model.Password).FirstOrDefault();
+                    if (userInfo != null)
                     {
-                        SignInUser(userId.Value, false);
+                        SignInUser(userInfo.Id, $"{userInfo.FirstName} {userInfo.LastName}", false);
                         return RedirectToLocal(returnUrl);
                     }
                     ModelState.AddModelError(string.Empty, "Неправильный логин или пароль.");
@@ -139,9 +139,13 @@ namespace DanceSchool.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        private void SignInUser(int id, bool isPersistent)
+        private void SignInUser(int id, string name, bool isPersistent)
         {
-            var claims = new List<Claim> { new Claim(ClaimTypes.Sid, id.ToString()) };
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, name),
+                new Claim(ClaimTypes.Sid, id.ToString())
+            };
             var claimsIdentity = new ClaimsIdentity(claims, DefaultAuthenticationTypes.ApplicationCookie);
             
             Request.GetOwinContext().Authentication.SignIn(
