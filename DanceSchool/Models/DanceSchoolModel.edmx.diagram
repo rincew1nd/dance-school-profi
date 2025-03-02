@@ -4,12 +4,14 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="e7edbbcf0fa848de900de95f967fa09c" Name="Diagram1">
-        <EntityTypeShape EntityType="DanceSchoolModel.AspNetUser" Width="1.5" PointX="3" PointY="6.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="DanceSchoolModel.Lesson" Width="1.5" PointX="3" PointY="1" IsExpanded="true" />
-        <EntityTypeShape EntityType="DanceSchoolModel.Registration" Width="1.5" PointX="5.25" PointY="1" IsExpanded="true" />
-        <EntityTypeShape EntityType="DanceSchoolModel.Style" Width="1.5" PointX="0.75" PointY="1.375" IsExpanded="true" />
-        <AssociationConnector Association="DanceSchoolModel.FK_Registrations_ToUser" ManuallyRouted="false" />
+      <Diagram DiagramId="31b9906d6f304cb18b2f4c84e1d581a9" Name="Diagram1">
+        <EntityTypeShape EntityType="DanceSchoolModel.AspUser" Width="1.5" PointX="3" PointY="1" IsExpanded="true" />
+        <EntityTypeShape EntityType="DanceSchoolModel.Lesson" Width="1.5" PointX="3" PointY="5.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="DanceSchoolModel.Registration" Width="1.5" PointX="6" PointY="3.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="DanceSchoolModel.Role" Width="1.5" PointX="0.75" PointY="1.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="DanceSchoolModel.Style" Width="1.5" PointX="0.75" PointY="5.625" IsExpanded="true" />
+        <AssociationConnector Association="DanceSchoolModel.FK_AspUsers_ToRoles" ManuallyRouted="false" />
+        <AssociationConnector Association="DanceSchoolModel.FK_Registrations_ToUserAsp" ManuallyRouted="false" />
         <AssociationConnector Association="DanceSchoolModel.FK_Lessons_ToStyles" ManuallyRouted="false" />
         <AssociationConnector Association="DanceSchoolModel.FK_Registrations_ToLesson" ManuallyRouted="false" />
       </Diagram>

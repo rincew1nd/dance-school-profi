@@ -15,11 +15,11 @@ namespace DanceSchool.Models
     public partial class Registration
     {
         public int Id { get; set; }
-        public string UserId { get; set; }
+        public int UserId { get; set; }
         public int LessonId { get; set; }
         public System.DateTime CreateDate { get; set; }
     
-        public virtual AspNetUser AspNetUser { get; set; }
+        public virtual AspUser AspUser { get; set; }
         public virtual Lesson Lesson { get; set; }
     }
 }
