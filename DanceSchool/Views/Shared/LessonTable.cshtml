@@ -1,5 +1,17 @@
 ﻿@model IEnumerable<DanceSchool.Models.LessonModel>
 
+<div class="row">
+    <div class="input-group mb-3">
+        <input type="text"
+               id="searchInput"
+               class="form-control"
+               placeholder="Поиск по стилю или названию занятия..."
+               aria-label="Поиск"
+               aria-describedby="search-records">
+        <span class="input-group-text px-3" id="search-records" onclick="searchTable()">🔍</span>
+    </div>
+</div>
+
 <table class="table">
     <tr>
         <th>@Html.DisplayNameFor(model => model.Date)</th>
@@ -12,7 +24,9 @@
     @foreach (var item in Model) {
         <tr class="clickable-row"
             data-href="@Url.Action("Details", "Lessons", new { id = item.Id })"
-            onclick="handleRowClick(event)">
+            onclick="handleRowClick(event)"
+            data-style="@item.Style.ToLower()"
+            data-lesson="@item.Name.ToLower()">
             <td>@Html.DisplayFor(modelItem => item.Date)</td>
             <td>@Html.DisplayFor(modelItem => item.Time)</td>
             <td>@Html.DisplayFor(modelItem => item.Duration)</td>
@@ -20,8 +34,49 @@
             <td>@Html.DisplayFor(modelItem => item.Name)</td>
         </tr>
     }
+
+    <tr id="noResults" class="text-muted">
+        <td colspan="5 text-centered">
+            <p>Ничего не найдено</p>
+        </td>
+    </tr>
 </table>
 
+<script>
+    function handleRowClick(event) {
+        if (!event.target.closest('.no-click')) {
+            window.location = event.currentTarget.dataset.href;
+        }
+    }
+    
+    function searchTable() {
+        const searchInput = document.getElementById('searchInput');
+        const lessons = document.querySelectorAll('.clickable-row');
+        const noResults = document.getElementById('noResults');
+
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        let hasVisibleItems = false;
+
+        lessons.forEach(item => {
+            const style = item.dataset.style;
+            const lesson = item.dataset.lesson;
+            const matchStyle = style.includes(searchTerm);
+            const matchLesson = lesson.includes(searchTerm);
+
+            item.style.display = (matchStyle || matchLesson) ? 'table-row' : 'none';
+            if (matchStyle || matchLesson) hasVisibleItems = true;
+        });
+
+        noResults.style.display = hasVisibleItems ? 'none' : 'table-row';
+    }
+
+    document.getElementById('searchInput').addEventListener("keydown", (e) => {
+        if (e.keyCode === 13) {
+            searchTable()
+        }});
+    
+    searchTable();
+</script>
 
 <style>
     .clickable-row {
@@ -32,11 +87,3 @@
         background-color: #f8f9fa;
     }
 </style>
-
-<script>
-    function handleRowClick(event) {
-        if (!event.target.closest('.no-click')) {
-            window.location = event.currentTarget.dataset.href;
-        }
-    }
-</script>

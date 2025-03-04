@@ -5,7 +5,7 @@
 
 <div class="centered-content">
     <div class="row justify-content-center">
-        <div class="">
+        <div class="col-sm-10 col-lg-10">
             <h2 id="title">@ViewBag.Title</h2>
             <hr />
             @if (User.IsInRole("1"))
@@ -15,6 +15,10 @@
                 </div>
                 <hr/>
             }
+            <div class="row">
+                @Html.ActionLink("Скачать занятия в формате PDF", "DownloadLessonReport", "Report", null, new { @class = "btn btn-outline-dark", target = "_blank" })
+            </div>
+            <hr/>
             @Html.Partial("LessonTable")
         </div>
     </div>

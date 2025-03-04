@@ -136,7 +136,7 @@ namespace DanceSchool.Controllers
             {
                 return Redirect(returnUrl);
             }
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Manage");
         }
 
         private void SignInUser(int id, string name, int roleId, bool isPersistent)
