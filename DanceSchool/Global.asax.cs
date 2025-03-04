@@ -15,7 +15,7 @@ namespace DanceSchool
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
             
-            AntiForgeryConfig.UniqueClaimTypeIdentifier = ClaimTypes.Sid;
+            AntiForgeryConfig.UniqueClaimTypeIdentifier = ClaimTypes.NameIdentifier;
         }
     }
 }

@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Linq;
+using System.Data.Entity;
+using System.IO;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.Owin;
-using Microsoft.Owin.Security;
 using DanceSchool.Models;
 
 namespace DanceSchool.Controllers
@@ -13,64 +12,116 @@ namespace DanceSchool.Controllers
     [Authorize]
     public class ManageController : Controller
     {
-        public ManageController()
+        private readonly DanceSchoolEntities db = new DanceSchoolEntities();
+        
+        public async Task<ActionResult> Index()
         {
-        }
-
-        //
-        // GET: /Manage/Index
-        public async Task<ActionResult> Index()//ManageMessageId? message)
-        {
-            //ViewBag.StatusMessage =
-            //    message == ManageMessageId.ChangePasswordSuccess ? "Your password has been changed."
-            //    : message == ManageMessageId.SetPasswordSuccess ? "Your password has been set."
-            //    : message == ManageMessageId.SetTwoFactorSuccess ? "Your two-factor authentication provider has been set."
-            //    : message == ManageMessageId.Error ? "An error has occurred."
-            //    : message == ManageMessageId.AddPhoneSuccess ? "Your phone number was added."
-            //    : message == ManageMessageId.RemovePhoneSuccess ? "Your phone number was removed."
-            //    : "";
-            //
-            //var userId = User.Identity.GetUserId();
-            var model = new IndexViewModel
+            try
             {
-                //HasPassword = HasPassword(),
-                //PhoneNumber = await UserManager.GetPhoneNumberAsync(userId),
-                //TwoFactor = await UserManager.GetTwoFactorEnabledAsync(userId),
-                //Logins = await UserManager.GetLoginsAsync(userId),
-                //BrowserRemembered = await AuthenticationManager.TwoFactorBrowserRememberedAsync(userId)
-            };
-            return View(model);
+                var userId = User.Identity.GetUserId<int>();
+
+                var user = await db.AspUsers.Include(u => u.Registrations).FirstAsync(x => x.Id == userId);
+                var model = new IndexViewModel
+                {
+                    Name = $"{user.FirstName} {user.LastName}",
+                    IsAdmin = user.RoleId == 1,
+                    Picture = user.Picture,
+                    Registrations = user.Registrations
+                };
+
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, $"Ошибка сервера - {ex.Message}");
+            }
+            
+            return View(new IndexViewModel());
+        }
+        
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> UpdatePicture(HttpPostedFileBase imageFile)
+        {
+            if (ModelState.IsValid)
+            {
+                var userId = User.Identity.GetUserId<int>();
+                var user = await db.AspUsers.FindAsync(userId);
+                
+                if (imageFile.ContentType != "image/jpeg" && imageFile.ContentType != "image/png")
+                {
+                    ModelState.AddModelError("", "Допустимы только JPEG и PNG.");
+                    return RedirectToAction("Index");
+                }
+                
+                if (imageFile.ContentLength > 0)
+                {
+                    using (var reader = new BinaryReader(imageFile.InputStream))
+                    {
+                        user.Picture = reader.ReadBytes(imageFile.ContentLength);
+                    }
+                }
+                await db.SaveChangesAsync();
+            }
+            return RedirectToAction("Index");
         }
 
-        //
-        // GET: /Manage/ChangePassword
+        [HttpGet]
         public ActionResult ChangePassword()
         {
-            return View();
+            return View(new ChangePasswordViewModel());
         }
-
-        //
-        // POST: /Manage/ChangePassword
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> ChangePassword(ChangePasswordViewModel model)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return View(model);
+                if (model.NewPassword != model.ConfirmPassword)
+                {
+                    ModelState.AddModelError(string.Empty, "Пароли не совпадают");
+                    return View(model);
+                }
+                
+                var userId = User.Identity.GetUserId<int>();
+                var user = await db.AspUsers.FindAsync(userId);
+
+                if (user == null)
+                {
+                    ModelState.AddModelError(string.Empty, "Пользователь не найден");
+                }
+
+                if (user.Password.TrimEnd() != model.OldPassword)
+                {
+                    ModelState.AddModelError(string.Empty, "Не совпадает старый пароль");
+                }
+                
+                if (ModelState.IsValid)
+                {
+                    user.Password = model.NewPassword;
+                    await db.SaveChangesAsync();
+                    return RedirectToAction("Index");
+                }
             }
-            //var result = await UserManager.ChangePasswordAsync(User.Identity.GetUserId(), model.OldPassword, model.NewPassword);
-            //if (result.Succeeded)
-            //{
-            //    var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
-            //    if (user != null)
-            //    {
-            //        await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
-            //    }
-            //    return RedirectToAction("Index", new { Message = ManageMessageId.ChangePasswordSuccess });
-            //}
-            //AddErrors(result);
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, $"Ошибка сервера - {ex.Message}");
+            }
+            
             return View(model);
+        }
+        
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> ChangeRole()
+        {
+            var userId = User.Identity.GetUserId<int>();
+            var user = await db.AspUsers.FindAsync(userId);
+            user.RoleId = user.RoleId == 1 ? 2 : 1;
+            await db.SaveChangesAsync();
+            Request.GetOwinContext().Authentication.SignOut();
+            return RedirectToAction("Login", "Account");
         }
     }
 }

@@ -1,0 +1,21 @@
+﻿@model IEnumerable<DanceSchool.Models.LessonModel>
+@{
+    ViewBag.Title = "Расписание занятий";
+}
+
+<div class="centered-content">
+    <div class="row justify-content-center">
+        <div class="">
+            <h2 id="title">@ViewBag.Title</h2>
+            <hr />
+            @if (User.IsInRole("1"))
+            {
+                <div class="row">
+                    @Html.ActionLink("Создать новое занятие", "Create", null, new { @class="btn btn-outline-dark" })
+                </div>
+                <hr/>
+            }
+            @Html.Partial("LessonTable")
+        </div>
+    </div>
+</div>

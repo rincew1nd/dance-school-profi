@@ -18,35 +18,61 @@
             width: 60px;
             margin-right: 10px;
         }
+        .navbar-nav > li {
+            text-align: center;
+        }
     </style>
 
 </head>
 <body class="d-flex flex-column min-vh-100">
-    <nav class="navbar navbar-expand-lg navbar-dark navbar-gradient shadow-sm">
+    <nav class="navbar navbar-expand-md navbar-dark navbar-gradient shadow-sm">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="@Url.Action("Index", "Home")">
+            <a class="navbar-brand mx-auto mx-md-0" href="@Url.Action("Index", "Home")">
                 <img src="~/Content/Images/Logo.png" alt="Логотип" class="brand-logo">
             </a>
+
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
             <div class="collapse navbar-collapse" id="mainNav">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <ul class="navbar-nav mx-auto mb-2 mb-md-0">
                     @if (User.Identity.IsAuthenticated)
                     {
-                        <li>@Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "nav-link link-dark" })</li>
-                        <li>@Html.ActionLink("Стили", "Index", "Styles", new { area = "" }, new { @class = "nav-link link-dark" })</li>
-                        <li>@Html.ActionLink("Занятия", "Index", "Lessons", new { area = "" }, new { @class = "nav-link link-dark" })</li>
+                        <li class="nav-item">
+                            @Html.ActionLink("Личный кабинет", "Index", "Manage", null, new { @class = "nav-link link-dark" })
+                        </li>
+                        <li class="nav-item">
+                            @Html.ActionLink("Расписания занятий", "Index", "Lessons", null, new { @class = "nav-link link-dark" })
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            @Html.ActionLink("Расписание занятий", "Index", "Lessons", null, new { @class = "nav-link link-dark" })
+                        </li>
+                        <li class="nav-item">
+                            @Html.ActionLink("Вход в систему", "Login", "Account", null, new { @class = "nav-link link-dark" })
+                        </li>
+                        <li class="nav-item">
+                            @Html.ActionLink("Регистрация", "Register", "Account", null, new { @class = "nav-link link-dark" })
+                        </li>
                     }
                 </ul>
-                @Html.Partial("_LoginPartial")
+
+                <div class="d-flex justify-content-center justify-content-md-end">
+                    @Html.Partial("_LoginPartial")
+                </div>
             </div>
         </div>
     </nav>
 
-    <main class="container flex-grow-1 py-4">
-        @RenderBody()
+    <main class="container flex-grow-1 py-4" style="max-width: 1000px">
+        <div class="row justify-content-center">
+            <div class="col-12">
+                @RenderBody()
+            </div>
+        </div>
     </main>
 
     <footer class="footer mt-auto">

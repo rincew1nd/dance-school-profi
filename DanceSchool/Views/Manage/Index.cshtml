@@ -1,89 +1,66 @@
-﻿@model DanceSchool.Models.IndexViewModel
+﻿@using DanceSchool.Models
+@model DanceSchool.Models.IndexViewModel
 @{
-    ViewBag.Title = "Manage";
+    ViewBag.Title = "Личный кабинет";
 }
 
-<main aria-labelledby="title">
-    <h2 id="title">@ViewBag.Title.</h2>
-
-    <p class="text-success">@ViewBag.StatusMessage</p>
-    <div>
-        <h4>Change your account settings</h4>
-        <hr />
-        <dl class="dl-horizontal">
-            <dt>Password:</dt>
-            <dd>
-                [
-                @if (Model.HasPassword)
+<div class="centered-content">
+    <div class="row justify-content-center">
+        <div class="col-sm-10 col-lg-10">
+            <h2 id="title">@ViewBag.Title</h2>
+            <hr />
+            <div class="row offset-sm-2 col-sm-8">
+                <div class="col-sm-4 overflow-hidden">
+                    @{
+                        if (Model.Picture != null)
+                        {
+                            var imageSrc = $"data:image/jpeg;base64,{Convert.ToBase64String(Model.Picture)}";
+                            <img src="@imageSrc" alt="ProfilePicture" class="w-100"/>
+                        }
+                    }
+                </div>
+                <div class="col-sm-6 text-start">
+                    <p class="col-sm-6 col-form-label w-100 ">@Model.Name</p>
+                    <p class="col-sm-6 col-form-label w-100">
+                        Роль: @(Model.IsAdmin ? "Администратор" : "Пользователь")
+                    </p>
+                </div>
+            </div>
+            <hr/>
+            <div class="row offset-sm-2 col-sm-8">
+                <div class="custom-form">
+                    @Html.ActionLink("Сменить пароль", "ChangePassword", "Manage", null, new { @class = "row btn btn-outline-dark col-sm-10" })
+                    @using (Html.BeginForm("ChangeRole", "Manage", FormMethod.Post, new { enctype = "multipart/form-data", @class = "custom-form" }))
+                    {
+                        @Html.AntiForgeryToken()
+                            <input type="submit" value="Сменить роль" class="btn btn-outline-dark col-sm-10"/>
+                    }
+                </div>
+                @using (Html.BeginForm("UpdatePicture", "Manage", FormMethod.Post, new { enctype = "multipart/form-data", @class = "custom-form" }))
                 {
-                    @Html.ActionLink("Change your password", "ChangePassword")
+                    @Html.AntiForgeryToken()
+                    <div class="row">
+                        <h5>Смена иконки профиля</h5>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-8">
+                            <input type="file" name="imageFile" class="form-control"/>
+                        </div>
+                        <input type="submit" value="Сохранить" class="btn btn-outline-dark col-sm-4"/>
+                    </div>
                 }
-                else
-                {
-                    @Html.ActionLink("Create", "SetPassword")
-                }
-                ]
-            </dd>
-            <dt>External Logins:</dt>
-            <dd>
-                @Model.Logins.Count [
-                @Html.ActionLink("Manage", "ManageLogins") ]
-            </dd>
-            @*
-                Phone Numbers can used as a second factor of verification in a two-factor authentication system.
-                
-                See <a href="https://go.microsoft.com/fwlink/?LinkId=403804">this article</a>
-                    for details on setting up this ASP.NET application to support two-factor authentication using SMS.
-                
-                Uncomment the following block after you have set up two-factor authentication
-            *@
-            @*  
-                <dt>Phone Number:</dt>
-                <dd>
-                    @(Model.PhoneNumber ?? "None")
-                    @if (Model.PhoneNumber != null)
-                    {
-                        <br />
-                        <text>[&nbsp;&nbsp;@Html.ActionLink("Change", "AddPhoneNumber")&nbsp;&nbsp;]</text>
-                        using (Html.BeginForm("RemovePhoneNumber", "Manage", FormMethod.Post, new { role = "form" }))
-                        {
-                            @Html.AntiForgeryToken()
-                            <text>[<input type="submit" value="Remove" class="btn-link" />]</text>
-                        }
-                    }
-                    else
-                    {
-                        <text>[&nbsp;&nbsp;@Html.ActionLink("Add", "AddPhoneNumber")
-                    }
-                </dd>
-            *@
-            <dt>Two-Factor Authentication:</dt>
-            <dd>
-                <p>
-                    There are no two-factor authentication providers configured. See <a href="https://go.microsoft.com/fwlink/?LinkId=403804">this article</a>
-                    for details on setting up this ASP.NET application to support two-factor authentication.
-                </p>
-                @*@if (Model.TwoFactor)
-                    {
-                        using (Html.BeginForm("DisableTwoFactorAuthentication", "Manage", FormMethod.Post, new { role = "form" }))
-                        {
-                            @Html.AntiForgeryToken()
-                            <text>Enabled
-                            <input type="submit" value="Disable" class="btn btn-link" />
-                            </text>
-                        }
-                    }
-                    else
-                    {
-                        using (Html.BeginForm("EnableTwoFactorAuthentication", "Manage", FormMethod.Post, new { role = "form" }))
-                        {
-                            @Html.AntiForgeryToken()
-                            <text>Disabled
-                            <input type="submit" value="Enable" class="btn btn-link" />
-                            </text>
-                        }
-                    }*@
-            </dd>
-        </dl>
+            </div>
+            <div class="row">
+                <div class="custom-form">
+                    <hr/>
+                    <div class="row">
+                        <h5>Записи</h5>
+                    </div>
+                    <div class="row">
+                        @Html.Partial("LessonTable", Model.Registrations.Select(r => r.Lesson.ToViewModel() as LessonModel))
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</main>
+</div>

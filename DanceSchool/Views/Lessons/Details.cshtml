@@ -1,0 +1,88 @@
+﻿@using Microsoft.AspNet.Identity
+@model DanceSchool.Models.LessonDetailsModel
+
+@{
+    ViewBag.Title = "Информация о занятии";
+}
+
+<div class="centered-content">
+    <div class="row justify-content-center">
+        <div class="col-12 col-sm-6">
+            <h2 id="title">@ViewBag.Title</h2>
+            <hr />
+
+            <div class="custom-form">
+                <div class="row">
+                    <div class="col-sm-4"><p>@Html.DisplayNameFor(model => model.Date)</p></div>
+                    <div class="col-sm-8"><p>@Html.DisplayFor(model => model.Date)</p></div>
+                </div>
+                <div class="row">
+                    <p class="col-sm-4">@Html.DisplayNameFor(model => model.Time)</p>
+                    <p class="col-sm-8">@Html.DisplayFor(model => model.Time)</p>
+                </div>
+                <div class="row">
+                    <p class="col-sm-4">@Html.DisplayNameFor(model => model.Duration)</p>
+                    <p class="col-sm-8">@Html.DisplayFor(model => model.Duration)</p>
+                </div>
+                <div class="row">
+                    <p class="col-sm-4">@Html.DisplayNameFor(model => model.Style)</p>
+                    <p class="col-sm-8">@Html.DisplayFor(model => model.Style)</p>
+                </div>
+                <div class="row">
+                    <p class="col-sm-4">@Html.DisplayNameFor(model => model.Name)</p>
+                    <p class="col-sm-8">@Html.DisplayFor(model => model.Name)</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6">
+                    @{
+                        var userId = User.Identity.GetUserId<int>();
+                        var userRegistration = Model.Registrations.FirstOrDefault(r => r.UserId == userId);
+                        if (userRegistration != null)
+                        {
+                            using (Html.BeginForm("Withdraw", "Lessons", new { lessonId = Model.Id, registrationId = userRegistration.Id }, FormMethod.Post))
+                            {
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-outline-dark w-100">Отменить запись</button>
+                            }
+                        }
+                        else
+                        {
+                            using (Html.BeginForm("Enroll", "Lessons", new { lessonId = Model.Id }, FormMethod.Post))
+                            {
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-outline-dark w-100">Записаться</button>
+                            }
+                        }
+                    }
+                </div>
+                @Html.ActionLink("Вернуться", "Index", null, htmlAttributes: new { @class="offset-sm-1 col-sm-5 btn btn-outline-dark" })
+            </div>
+            <hr/>
+            @if (User.IsInRole("1"))
+            {
+                <div class="custom-form">
+                    <div class="row">
+                        <h5>Управление занятием</h5>
+                    </div>
+                    <div class="row">
+                        @Html.ActionLink("Редактировать", "Edit", new { id = Model.Id }, new { @class="col-sm-6 btn btn-outline-dark" })
+                        @Html.ActionLink("Удалить", "Delete", new { id = Model.Id}, new { @class="offset-sm-1 col-sm-5 btn btn-outline-dark" })
+                    </div>
+                </div>
+                <hr/>
+            }
+            <div class="custom-form">
+                <div class="row">
+                    <h5>Посетители</h5>
+                </div>
+                @foreach (var registration in Model.Registrations)
+                {
+                    <div class="row">
+                        <p>@registration.AspUser.FirstName @registration.AspUser.LastName</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

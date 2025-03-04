@@ -3,3 +3,5 @@ bin/
 obj/
 .idea/
 .vs/
+/DanceSchool/Properties/PublishProfiles/*.user
+/DanceSchool/Properties/PublishProfiles/*.pubxml

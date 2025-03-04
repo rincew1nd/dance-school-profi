@@ -17,6 +17,7 @@
           <Property Name="Password" Type="nchar" MaxLength="30" Nullable="false" />
           <Property Name="RoleId" Type="int" Nullable="false" />
           <Property Name="RegistrationDate" Type="datetime" Nullable="false" />
+          <Property Name="Picture" Type="varbinary(max)" />
         </EntityType>
         <EntityType Name="Lessons">
           <Key>
@@ -151,6 +152,7 @@
           <Property Name="RegistrationDate" Type="DateTime" Nullable="false" Precision="3" />
           <NavigationProperty Name="Role" Relationship="Self.FK_AspUsers_ToRoles" FromRole="AspUsers" ToRole="Roles" />
           <NavigationProperty Name="Registrations" Relationship="Self.FK_Registrations_ToUserAsp" FromRole="AspUsers" ToRole="Registrations" />
+          <Property Name="Picture" Type="Binary" MaxLength="Max" FixedLength="false" />
         </EntityType>
         <EntityType Name="Lesson">
           <Key>
@@ -277,6 +279,7 @@
           <Property Type="Int32" Name="Id" Nullable="false" />
           <Property Type="String" Name="FirstName" Nullable="false" MaxLength="30" />
           <Property Type="String" Name="LastName" Nullable="false" MaxLength="50" />
+          <Property Type="Int32" Name="RoleId" Nullable="false" />
         </ComplexType>
       </Schema>
     </edmx:ConceptualModels>
@@ -287,6 +290,7 @@
           <EntitySetMapping Name="AspUsers">
             <EntityTypeMapping TypeName="DanceSchoolModel.AspUser">
               <MappingFragment StoreEntitySet="AspUsers">
+                <ScalarProperty Name="Picture" ColumnName="Picture" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="FirstName" ColumnName="FirstName" />
                 <ScalarProperty Name="LastName" ColumnName="LastName" />
@@ -336,12 +340,13 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <FunctionImportMapping FunctionImportName="Insert_User" FunctionName="DanceSchoolModel.Store.Insert_User" />
-          <FunctionImportMapping FunctionImportName="User_Login" FunctionName="DanceSchoolModel.Store.User_Login">
+          <FunctionImportMapping FunctionImportName="User_Login" FunctionName="DanceSchoolModel.Store.User_Login" >
             <ResultMapping>
               <ComplexTypeMapping TypeName="DanceSchoolModel.User_Login_Result">
+                <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="FirstName" ColumnName="FirstName" />
                 <ScalarProperty Name="LastName" ColumnName="LastName" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="RoleId" ColumnName="RoleId" />
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>

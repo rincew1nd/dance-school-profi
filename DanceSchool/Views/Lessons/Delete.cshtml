@@ -1,0 +1,42 @@
+﻿@model DanceSchool.Models.Lesson
+
+@{
+    ViewBag.Title = "Удаление занятия";
+}
+
+<div class="centered-content">
+    <div class="row justify-content-center">
+        <div class="col-sm-7">
+            <h2 id="title">@ViewBag.Title</h2>
+            <hr />
+
+            <div class="custom-form">
+                <div class="row">
+                    <div class="col-sm-4"><p>Дата</p></div>
+                    <div class="col-sm-8"><p>@Html.DisplayFor(model => model.Date)</p></div>
+                </div>
+                <div class="row">
+                    <p class="col-sm-4">Продолжительность</p>
+                    <p class="col-sm-8">@Html.DisplayFor(model => model.Duration)</p>
+                </div>
+                <div class="row">
+                    <p class="col-sm-4">Стиль</p>
+                    <p class="col-sm-8">@Html.DisplayFor(model => model.Style.Name)</p>
+                </div>
+                <div class="row">
+                    <p class="col-sm-4">Название</p>
+                    <p class="col-sm-8">@Html.DisplayFor(model => model.Name)</p>
+                </div>
+            </div>
+            
+            @using (Html.BeginForm()) {
+                @Html.AntiForgeryToken()
+
+                <div class="form-actions no-color">
+                    <input type="submit" value="Удалить" class="btn btn-outline-dark" />
+                    @Html.ActionLink("Вернуться", "Details", new { Id = Model.Id }, new { @class="btn btn-outline-dark" })
+                </div>
+            }
+        </div>
+    </div>
+</div>

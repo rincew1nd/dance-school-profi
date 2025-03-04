@@ -1,0 +1,42 @@
+﻿@model IEnumerable<DanceSchool.Models.LessonModel>
+
+<table class="table">
+    <tr>
+        <th>@Html.DisplayNameFor(model => model.Date)</th>
+        <th>@Html.DisplayNameFor(model => model.Date)</th>
+        <th>@Html.DisplayNameFor(model => model.Duration)</th>
+        <th>@Html.DisplayNameFor(model => model.Style)</th>
+        <th>@Html.DisplayNameFor(model => model.Name)</th>
+    </tr>
+
+    @foreach (var item in Model) {
+        <tr class="clickable-row"
+            data-href="@Url.Action("Details", "Lessons", new { id = item.Id })"
+            onclick="handleRowClick(event)">
+            <td>@Html.DisplayFor(modelItem => item.Date)</td>
+            <td>@Html.DisplayFor(modelItem => item.Time)</td>
+            <td>@Html.DisplayFor(modelItem => item.Duration)</td>
+            <td>@Html.DisplayFor(modelItem => item.Style)</td>
+            <td>@Html.DisplayFor(modelItem => item.Name)</td>
+        </tr>
+    }
+</table>
+
+
+<style>
+    .clickable-row {
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    .clickable-row:hover {
+        background-color: #f8f9fa;
+    }
+</style>
+
+<script>
+    function handleRowClick(event) {
+        if (!event.target.closest('.no-click')) {
+            window.location = event.currentTarget.dataset.href;
+        }
+    }
+</script>
