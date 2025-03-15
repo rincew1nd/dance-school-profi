@@ -12,7 +12,11 @@ namespace DanceSchool.Controllers
     [Authorize]
     public class ManageController : Controller
     {
-        private readonly DanceSchoolEntities db = new DanceSchoolEntities();
+        private readonly DanceSchoolEntities _db;
+        public ManageController(DanceSchoolEntities db)
+        {
+            _db = db;
+        }
         
         public async Task<ActionResult> Index()
         {
@@ -20,7 +24,7 @@ namespace DanceSchool.Controllers
             {
                 var userId = User.Identity.GetUserId<int>();
 
-                var user = await db.AspUsers.Include(u => u.Registrations).FirstAsync(x => x.Id == userId);
+                var user = await _db.AspUsers.Include(u => u.Registrations).FirstAsync(x => x.Id == userId);
                 var model = new IndexViewModel
                 {
                     Name = $"{user.FirstName} {user.LastName}",
@@ -46,7 +50,7 @@ namespace DanceSchool.Controllers
             if (ModelState.IsValid)
             {
                 var userId = User.Identity.GetUserId<int>();
-                var user = await db.AspUsers.FindAsync(userId);
+                var user = await _db.AspUsers.FindAsync(userId);
                 
                 if (imageFile.ContentType != "image/jpeg" && imageFile.ContentType != "image/png")
                 {
@@ -61,7 +65,7 @@ namespace DanceSchool.Controllers
                         user.Picture = reader.ReadBytes(imageFile.ContentLength);
                     }
                 }
-                await db.SaveChangesAsync();
+                await _db.SaveChangesAsync();
             }
             return RedirectToAction("Index");
         }
@@ -85,7 +89,7 @@ namespace DanceSchool.Controllers
                 }
                 
                 var userId = User.Identity.GetUserId<int>();
-                var user = await db.AspUsers.FindAsync(userId);
+                var user = await _db.AspUsers.FindAsync(userId);
 
                 if (user == null)
                 {
@@ -100,7 +104,7 @@ namespace DanceSchool.Controllers
                 if (ModelState.IsValid)
                 {
                     user.Password = model.NewPassword;
-                    await db.SaveChangesAsync();
+                    await _db.SaveChangesAsync();
                     return RedirectToAction("Index");
                 }
             }
@@ -117,9 +121,9 @@ namespace DanceSchool.Controllers
         public async Task<ActionResult> ChangeRole()
         {
             var userId = User.Identity.GetUserId<int>();
-            var user = await db.AspUsers.FindAsync(userId);
+            var user = await _db.AspUsers.FindAsync(userId);
             user.RoleId = user.RoleId == 1 ? 2 : 1;
-            await db.SaveChangesAsync();
+            await _db.SaveChangesAsync();
             Request.GetOwinContext().Authentication.SignOut();
             return RedirectToAction("Login", "Account");
         }

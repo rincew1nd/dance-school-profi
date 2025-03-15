@@ -14,7 +14,11 @@ namespace DanceSchool.Controllers
     [Authorize]
     public class AccountController : Controller
     {
-        private readonly DanceSchoolEntities db = new DanceSchoolEntities();
+        private readonly DanceSchoolEntities _db;
+        public AccountController(DanceSchoolEntities db)
+        {
+            _db = db;
+        }
         
         [AllowAnonymous]
         public ActionResult Login(string returnUrl)
@@ -44,7 +48,7 @@ namespace DanceSchool.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var userInfo = db.User_Login(model.Email, model.Password).FirstOrDefault();
+                    var userInfo = _db.User_Login(model.Email, model.Password).FirstOrDefault();
                     if (userInfo != null)
                     {
                         SignInUser(userInfo.Id, $"{userInfo.FirstName} {userInfo.LastName}", userInfo.RoleId, false);
@@ -78,17 +82,15 @@ namespace DanceSchool.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Register(RegisterViewModel model)
         {
-            var transaction = db.Database.BeginTransaction();
             try
             {
                 if (ModelState.IsValid)
                 {
                     var regInfo =
-                        db.Insert_User(model.Email, model.Password, model.FirstName, model.LastName, 2).First();
+                        _db.Insert_User(model.Email, model.Password, model.FirstName, model.LastName, 2).First();
                     if (Convert.ToInt32(regInfo) != -1)
                     {
-                        await db.SaveChangesAsync();
-                        transaction.Commit();
+                        await _db.SaveChangesAsync();
 
                         return RedirectToAction("Login", "Account");
                     }
@@ -98,7 +100,6 @@ namespace DanceSchool.Controllers
             }
             catch (Exception ex)
             {
-                transaction.Rollback();
                 ModelState.AddModelError(string.Empty, $"Ошибка сервера - {ex.Message}");
             }
 

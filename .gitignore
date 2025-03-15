@@ -5,3 +5,4 @@ obj/
 .vs/
 /DanceSchool/Properties/PublishProfiles/*.user
 /DanceSchool/Properties/PublishProfiles/*.pubxml
+/*.user

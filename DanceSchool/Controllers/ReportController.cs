@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using DanceSchool.Models;
@@ -12,17 +13,22 @@ namespace DanceSchool.Controllers
 {
     public class ReportController : Controller
     {
-        private readonly DanceSchoolEntities db = new DanceSchoolEntities();
+        private readonly DanceSchoolEntities _db;
+        public ReportController(DanceSchoolEntities db)
+        {
+            _db = db;
+        }
 
         public async Task<ActionResult> DownloadLessonReport()
         {
-            var lessons = await db.Lessons.Include(l => l.Registrations).ToListAsync();
+            var lessons = await _db.Lessons.Include(l => l.Registrations).ToListAsync();
             var pdfBytes = GeneratePdf(lessons);
             return File(pdfBytes, "application/pdf", $"LessonReport-{DateTime.Now:yyyyMMddHHmmss}.pdf");
         }
 
         public byte[] GeneratePdf(List<Lesson> data)
         {
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             using (var ms = new MemoryStream())
             {
                 // Создание документа
@@ -30,9 +36,11 @@ namespace DanceSchool.Controllers
                 var writer = PdfWriter.GetInstance(doc, ms);
 
                 doc.Open();
-
+                var filepath = ControllerContext.HttpContext.Server.MapPath("..\\arial.ttf");
+                BaseFont bf = BaseFont.CreateFont(filepath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+                
                 // Заголовок
-                var titleFont = FontFactory.GetFont("Arial", 18, BaseColor.DARK_GRAY);
+                var titleFont = new Font(bf, 18, Font.NORMAL);
                 var title = new Paragraph("Отчет по занятиям", titleFont)
                 {
                     Alignment = Element.ALIGN_CENTER,
@@ -49,7 +57,7 @@ namespace DanceSchool.Controllers
                 };
 
                 // Заголовки таблицы
-                var headerFont = FontFactory.GetFont("Arial", 12, BaseColor.WHITE);
+                var headerFont = new Font(bf, 12, Font.NORMAL);
                 AddHeaderCell(table, "Дата", headerFont, BaseColor.GRAY);
                 AddHeaderCell(table, "Время", headerFont, BaseColor.GRAY);
                 AddHeaderCell(table, "Длительность", headerFont, BaseColor.GRAY);
@@ -57,7 +65,7 @@ namespace DanceSchool.Controllers
                 AddHeaderCell(table, "Название", headerFont, BaseColor.GRAY);
 
                 // Данные
-                var cellFont = FontFactory.GetFont("Arial", 10);
+                var cellFont = new Font(bf, 10, Font.NORMAL);
                 foreach (var item in data)
                 {
                     AddCell(table, item.Date.ToString("dd.MM.yyyy"), cellFont);
@@ -71,7 +79,7 @@ namespace DanceSchool.Controllers
 
                 // Подвал
                 var footer = new Paragraph($"Сгенерировано: {DateTime.Now:dd.MM.yyyy HH:mm}",
-                    FontFactory.GetFont("Arial", 8, BaseColor.LIGHT_GRAY))
+                    new Font(bf, 8, Font.NORMAL))
                 {
                     Alignment = Element.ALIGN_RIGHT
                 };
@@ -101,62 +109,5 @@ namespace DanceSchool.Controllers
                 HorizontalAlignment = Element.ALIGN_LEFT
             });
         }
-
-        /*
-        private byte[] GeneratePdf(IEnumerable<Lesson> lessons)
-        {
-            var document = Document.Create(container =>
-            {
-                foreach (var lesson in lessons)
-                {
-                    container.Page(page =>
-                    {
-                        page.Size(PageSizes.A4);
-                        page.Margin(2, Unit.Centimetre);
-                        page.DefaultTextStyle(x => x.FontSize(12));
-
-                        page.Header()
-                            .AlignCenter()
-                            .Text($"Отчет по занятию: {lesson.Name}")
-                            .FontSize(20).Bold();
-
-                        page.Content()
-                            .PaddingVertical(1, Unit.Centimetre)
-                            .Column(column =>
-                            {
-                                column.Item().Text($"Дата: {lesson.Date:dd.MM.yyyy}");
-                                column.Item().Text($"Время: {lesson.Date:HH:mm:ss}");
-                                column.Item().Text($"Длительность: {lesson.Duration.ToString()}");
-                                column.Item().Text($"Стиль: {lesson.Style.Name}");
-
-                                column.Item().PaddingTop(15).LineHorizontal(1);
-
-                                column.Item().Text("Участники:").FontSize(14).Bold();
-                                foreach (var reg in lesson.Registrations)
-                                {
-                                    column.Item().Text($"{reg.AspUser.FirstName} {reg.AspUser.LastName}");
-                                }
-                            });
-
-                        page.Footer()
-                            .AlignCenter()
-                            .Text(x =>
-                            {
-                                x.Span("Страница ");
-                                x.CurrentPageNumber();
-                            });
-                    });
-                }
-            });
-
-            using (var stream = new MemoryStream())
-            {
-                document.GeneratePdf(stream);
-                return stream.ToArray();
-            }
-        }
-        */
-
-
     }
 }

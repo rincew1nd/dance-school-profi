@@ -11,12 +11,16 @@ namespace DanceSchool.Controllers
 {
     public class LessonsController : Controller
     {
-        private DanceSchoolEntities db = new DanceSchoolEntities();
+        private readonly DanceSchoolEntities _db;
+        public LessonsController(DanceSchoolEntities db)
+        {
+            _db = db;
+        }
 
         [AllowAnonymous]
         public async Task<ActionResult> Index()
         {
-            var lessons = await db.Lessons.Include(l => l.Style).OrderBy(x => x.Date).ToListAsync();
+            var lessons = await _db.Lessons.Include(l => l.Style).OrderBy(x => x.Date).ToListAsync();
             return View(lessons.Select(x => x.ToViewModel() as LessonModel));
         }
 
@@ -27,7 +31,7 @@ namespace DanceSchool.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            var lesson = await db.Lessons
+            var lesson = await _db.Lessons
                 .Include(l => l.Style)
                 .Include(l => l.Registrations)
                 .FirstOrDefaultAsync(l => l.Id == id);
@@ -43,7 +47,7 @@ namespace DanceSchool.Controllers
         // GET: Lessons/Create
         public ActionResult Create()
         {
-            ViewBag.StyleId = new SelectList(db.Styles, "Id", "Name");
+            ViewBag.StyleId = new SelectList(_db.Styles, "Id", "Name");
             return View();
         }
 
@@ -56,12 +60,12 @@ namespace DanceSchool.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Lessons.Add(lesson);
-                db.SaveChanges();
+                _db.Lessons.Add(lesson);
+                _db.SaveChanges();
                 return RedirectToAction("Index");
             }
 
-            ViewBag.StyleId = new SelectList(db.Styles, "Id", "Name", lesson.StyleId);
+            ViewBag.StyleId = new SelectList(_db.Styles, "Id", "Name", lesson.StyleId);
             return View(lesson);
         }
 
@@ -72,12 +76,12 @@ namespace DanceSchool.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Lesson lesson = db.Lessons.Find(id);
+            Lesson lesson = _db.Lessons.Find(id);
             if (lesson == null)
             {
                 return HttpNotFound();
             }
-            ViewBag.StyleId = new SelectList(db.Styles, "Id", "Name", lesson.StyleId);
+            ViewBag.StyleId = new SelectList(_db.Styles, "Id", "Name", lesson.StyleId);
             return View(lesson);
         }
 
@@ -90,11 +94,11 @@ namespace DanceSchool.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Entry(lesson).State = EntityState.Modified;
-                db.SaveChanges();
+                _db.Entry(lesson).State = EntityState.Modified;
+                _db.SaveChanges();
                 return RedirectToAction("Details", new { Id = lesson.Id });
             }
-            ViewBag.StyleId = new SelectList(db.Styles, "Id", "Name", lesson.StyleId);
+            ViewBag.StyleId = new SelectList(_db.Styles, "Id", "Name", lesson.StyleId);
             return View(lesson);
         }
 
@@ -105,7 +109,7 @@ namespace DanceSchool.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Lesson lesson = db.Lessons.Find(id);
+            Lesson lesson = _db.Lessons.Find(id);
             if (lesson == null)
             {
                 return HttpNotFound();
@@ -118,9 +122,9 @@ namespace DanceSchool.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Lesson lesson = db.Lessons.Find(id);
-            db.Lessons.Remove(lesson);
-            db.SaveChanges();
+            Lesson lesson = _db.Lessons.Find(id);
+            _db.Lessons.Remove(lesson);
+            _db.SaveChanges();
             return RedirectToAction("Index");
         }
         
@@ -128,7 +132,7 @@ namespace DanceSchool.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Enroll(int lessonId)
         {
-            var lesson = await db.Lessons
+            var lesson = await _db.Lessons
                 .Include(l => l.Style)
                 .Include(l => l.Registrations)
                 .FirstAsync(l => l.Id == lessonId);
@@ -136,7 +140,7 @@ namespace DanceSchool.Controllers
             try
             {
                 var userId = User.Identity.GetUserId<int>();
-                var user = await db.AspUsers.FindAsync(userId);
+                var user = await _db.AspUsers.FindAsync(userId);
                 if (user == null)
                 {
                     ModelState.AddModelError(string.Empty, "Пользователь не найден");
@@ -148,8 +152,8 @@ namespace DanceSchool.Controllers
                     LessonId = lesson.Id,
                     CreateDate = DateTime.Now
                 };
-                db.Registrations.Add(registration);
-                await db.SaveChangesAsync();
+                _db.Registrations.Add(registration);
+                await _db.SaveChangesAsync();
             }
             catch (Exception ex)
             {
@@ -163,7 +167,7 @@ namespace DanceSchool.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Withdraw(int lessonId, int registrationId)
         {
-            var lesson = await db.Lessons
+            var lesson = await _db.Lessons
                 .Include(l => l.Style)
                 .Include(l => l.Registrations)
                 .FirstAsync(l => l.Id == lessonId);
@@ -171,15 +175,15 @@ namespace DanceSchool.Controllers
             try
             {
                 var userId = User.Identity.GetUserId<int>();
-                var user = await db.AspUsers.FindAsync(userId);
+                var user = await _db.AspUsers.FindAsync(userId);
                 if (user == null)
                 {
                     ModelState.AddModelError(string.Empty, "Пользователь не найден");
                 }
 
-                var registration = await db.Registrations.FindAsync(registrationId);
-                db.Registrations.Remove(registration);
-                await db.SaveChangesAsync();
+                var registration = await _db.Registrations.FindAsync(registrationId);
+                _db.Registrations.Remove(registration);
+                await _db.SaveChangesAsync();
             }
             catch (Exception ex)
             {
@@ -187,15 +191,6 @@ namespace DanceSchool.Controllers
             }
             
             return RedirectToAction("Details", lesson.ToViewModel());
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                db.Dispose();
-            }
-            base.Dispose(disposing);
         }
     }
 }

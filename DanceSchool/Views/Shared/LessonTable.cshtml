@@ -14,11 +14,26 @@
 
 <table class="table">
     <tr>
-        <th>@Html.DisplayNameFor(model => model.Date)</th>
-        <th>@Html.DisplayNameFor(model => model.Date)</th>
-        <th>@Html.DisplayNameFor(model => model.Duration)</th>
-        <th>@Html.DisplayNameFor(model => model.Style)</th>
-        <th>@Html.DisplayNameFor(model => model.Name)</th>
+        <th onclick="sortTable(1)" class="sortable">
+            @Html.DisplayNameFor(model => model.Date)
+            <span class="sort-arrow"></span>
+        </th>
+        <th onclick="sortTable(1)" class="sortable">
+            @Html.DisplayNameFor(model => model.Time)
+            <span class="sort-arrow"></span>
+        </th>
+        <th onclick="sortTable(2)" class="sortable">
+            @Html.DisplayNameFor(model => model.Duration)
+            <span class="sort-arrow"></span>
+        </th>
+        <th onclick="sortTable(3)" class="sortable">
+            @Html.DisplayNameFor(model => model.Style)
+            <span class="sort-arrow"></span>
+        </th>
+        <th onclick="sortTable(4)" class="sortable">
+            @Html.DisplayNameFor(model => model.Name)
+            <span class="sort-arrow"></span>
+        </th>
     </tr>
 
     @foreach (var item in Model) {
@@ -26,7 +41,9 @@
             data-href="@Url.Action("Details", "Lessons", new { id = item.Id })"
             onclick="handleRowClick(event)"
             data-style="@item.Style.ToLower()"
-            data-lesson="@item.Name.ToLower()">
+            data-lesson="@item.Name.ToLower()"
+            data-date="@item.Date"
+            data-duration="@item.Duration">
             <td>@Html.DisplayFor(modelItem => item.Date)</td>
             <td>@Html.DisplayFor(modelItem => item.Time)</td>
             <td>@Html.DisplayFor(modelItem => item.Duration)</td>
@@ -41,6 +58,63 @@
         </td>
     </tr>
 </table>
+
+<script>
+    let currentSortColumn = -1;
+    let isAscending = true;
+
+    function sortTable(columnIndex) {
+        const rows = Array.from(document.querySelectorAll('.clickable-row'));
+        const header = document.querySelectorAll('th.sortable')[columnIndex];
+
+        // Сброс стрелок у других колонок
+        document.querySelectorAll('.sort-arrow').forEach(arrow => {
+            arrow.textContent = '';
+        });
+
+        // Определение направления сортировки
+        if (currentSortColumn === columnIndex) {
+            isAscending = !isAscending;
+        } else {
+            currentSortColumn = columnIndex;
+            isAscending = true;
+        }
+
+        // Обновление стрелки
+        header.querySelector('.sort-arrow').textContent = isAscending ? '↑' : '↓';
+
+        // Сортировка строк
+        rows.sort((a, b) => {
+            const aValue = getCellValue(a.cells[columnIndex], columnIndex);
+            const bValue = getCellValue(b.cells[columnIndex], columnIndex);
+
+            return compareValues(aValue, bValue, columnIndex);
+        });
+
+        // Перезапись таблицы
+        const tbody = document.querySelector('tbody');
+        tbody.append(...(isAscending ? rows : rows.reverse()));
+    }
+    
+    function getCellValue(cell, columnIndex) {
+        // Используем data-атрибуты для точной сортировки
+        const row = cell.parentElement;
+        switch(columnIndex) {
+            case 1: return row.dataset.date;
+            case 2: return parseInt(row.dataset.duration.replaceAll(':', ''));
+            case 3: return row.dataset.style.toLowerCase();
+            case 4: return row.dataset.lesson.toLowerCase();
+            default: return cell.textContent.trim().toLowerCase();
+        }
+    }
+
+    function compareValues(a, b, columnIndex) {
+        if (columnIndex === 2) {
+            return a - b;
+        }
+        return a.localeCompare(b);
+    }
+</script>
 
 <script>
     function handleRowClick(event) {
